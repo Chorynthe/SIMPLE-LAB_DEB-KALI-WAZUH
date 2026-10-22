@@ -156,8 +156,3 @@ Ce lab a nécessité la résolution de plusieurs contraintes matérielles, de vi
 
 ---
 
-## 🧠 Compétences Démontrées
-
-* **Blue Team / Analyse SOC :** Déploiement et administration d'un SIEM (Wazuh), configuration de la réponse active, corrélation d'événements multi-sources, surveillance d'intégrité (FIM), utilisation des frameworks **MITRE ATT&CK** et **PCI DSS**.
-* **Red Team / Pentest :** Reconnaissance réseau (Nmap), attaques par force brute (Hydra), élévation de privilèges Linux (GTFOBins), techniques de persistance système, exploitation applicative (SQLi, LFI).
-* **Administration Systèmes & Réseaux :** Dépannage avancé de l'hyperviseur Linux (Kernel, GRUB, modules DKMS), segmentation réseau, administration de services système (Systemd, Syslog, Apache), gestion de version et traçabilité avec Git.
