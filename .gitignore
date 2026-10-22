@@ -1,0 +1,21 @@
+# Fichiers de virtualisation
+*.vdi
+*.vbox
+*.vbox-prev
+*.ova
+*.vmdk
+
+# Clés privées réelles et secrets
+*.pem
+*.key
+id_rsa
+id_rsa.pub
+
+# Journaux système bruts locaux
+*.log
+
+# Caches et fichiers d'OS
+.DS_Store
+Thumbs.db
+*~
+*.swp
