@@ -1,4 +1,7 @@
-# Fichiers de virtualisation
+# Fichiers de virtualisation (KVM/QEMU, etc.)
+*.qcow2
+*.raw
+*.img
 *.vdi
 *.vbox
 *.vbox-prev

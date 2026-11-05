@@ -1,21 +1,19 @@
-1. WRITE-UP TECHNIQUE
-Objectif & Périmètre
+# 1. WRITE-UP TECHNIQUE
 
-Conception et industrialisation d'un Cyberlab d'entraînement offensif/défensif (Red vs Blue) localisé sur un hôte physique Linux (ThinkPad L14 Gen 4). L'objectif était d'éradiquer la friction opérationnelle (temps de boot, clics sous VirtualBox/VMware, gestion manuelle des adresses IP et fenêtres) via une orchestration 100 % CLI sous KVM/QEMU/Libvirt.
-Topologie du Lab
+## Objectif & Périmètre
 
-    Hyperviseur : Linux KVM / Libvirt (QEMU System)
+Conception et industrialisation d'un Cyberlab d'entraînement offensif/défensif (Red vs Blue) localisé sur un hôte physique Linux (ThinkPad L14 Gen 4). L'objectif était d'éradiquer la friction opérationnelle (temps de boot, clics dans les interfaces graphiques d'hyperviseurs, gestion manuelle des adresses IP et fenêtres) via une orchestration 100 % CLI sous **KVM / QEMU / Libvirt**.
 
-    Réseau : Bridge NAT isolé 192.168.122.0/24 (DHCP Libvirt)
+## Topologie du Lab
 
-    Machines Virtuelles :
+* **Hyperviseur :** Linux KVM / Libvirt (`qemu:///system`)
+* **Réseau :** Bridge NAT isolé `192.168.122.0/24` (DHCP Libvirt)
+* **Machines Virtuelles :**
+  * **`KALI_VM`** (`192.168.122.2`) : Machine d'attaque / Red Team (User : `kali`).
+  * **`DEBIAN_VM_TARGET`** (`192.168.122.4`) : Machine cible / vulnérable (User : `jweak`).
+  * **`WAZUH`** (`192.168.122.3`) : Appliance SIEM/XDR Blue Team (User : `wazuh-user` + Web UI HTTPS).
 
-        KALI_VM (192.168.122.2) : Machine d'attaque / Red Team (User : kali).
-
-        DEBIAN_VM_TARGET (192.168.122.4) : Machine cible / vulnérable (User : jweak).
-
-        WAZUH (192.168.122.3) : Appliance SIEM/XDR Blue Team (User : wazuh-user + Web UI HTTPS).
-
+```text
                       +---------------------------------------+
                       |       Hôte Physique (ThinkPad)        |
                       |            CLI: `cyberlab`            |
@@ -30,25 +28,19 @@ Topologie du Lab
 |  (Red Team Box)  |             |  (Target/Vuln)   |             |   (SIEM / SOC)   |
 |  192.168.122.2   |             |  192.168.122.4   |             |  192.168.122.3   |
 +------------------+             +------------------+             +------------------+
+```
 
-Réalisations & Défis Résolus
+## Réalisations & Défis Résolus
 
-    Pilotage programmatique & Télémétrie en temps réel :
+1. **Pilotage programmatique & Télémétrie en temps réel :**
+   * Script d'automatisation Bash `cyberlab` intégré dans `$PATH` (`~/.local/bin/cyberlab`).
+   * Dashboard interactif exploitant `tput smcup`/`civis` pour un rafraîchissement *in-place* sans scintillement (*flicker-free*), combiné aux commandes d'introspection Libvirt (`dommemstat --period 2 --live` et `domifaddr`).
 
-        Script d'automatisation Bash cyberlab intégré dans $PATH (~/.local/bin/).
+2. **Gestion fine du protocole SSH & Chiffrement asymétrique :**
+   * Déploiement de clés sans mot de passe.
+   * **Incident résolu :** L'appliance Wazuh (Amazon Linux 2023 / FIPS compliant) rejetait la clé standard `ed25519` dans sa phase de négociation `KEXINIT`. Résolution par génération et déploiement d'une clé elliptique `ECDSA-SHA2-NISTP256`, respectant les *crypto-policies* de l'appliance.
 
-        Dashboard interactif exploitant tput smcup/civis pour un rafraîchissement in-place sans scintillement (flicker-free), combiné aux commandes d'introspection Libvirt (dommemstat --period 2 --live et domifaddr).
-
-    Gestion fine du protocole SSH & Chiffrement asymétrique :
-
-        Déploiement de clés sans mot de passe.
-
-        Incident résolu : L'appliance Wazuh (Amazon Linux 2023 / FIPS compliant) rejetait la clé standard ed25519 dans sa phase de négociation KEXINIT. Résolution par génération et déploiement d'une clé elliptique ECDSA-SHA2-NISTP256, respectant les crypto-policies de l'appliance.
-
-    Workspace Orchestration & Tiling Hybride :
-
-        Automatisation multi-fenêtre GNOME Terminal avec calcul dynamique de la géométrie d'affichage (xdpyinfo) pour répartir les consoles en quadrants d'écran.
-
-        Gestion du cycle de vie du shell : enchaînement ssh ... && exit || exec bash assurant la fermeture immédiate de la fenêtre sur un exit volontaire tout en maintenant le terminal ouvert en cas d'erreur réseau pour diagnostic.
-
-        Commande gui unifiée combinant affichage distant matériel (virt-viewer --wait) et ouverture automatisée du navigateur hôte (xdg-open) sur le portail Web Wazuh.
+3. **Workspace Orchestration & Tiling Hybride :**
+   * Automatisation multi-fenêtre GNOME Terminal avec calcul dynamique de la géométrie d'affichage (`xdpyinfo`) pour répartir les consoles en quadrants d'écran.
+   * Gestion du cycle de vie du shell : enchaînement `ssh ... && exit || exec bash` assurant la fermeture immédiate de la fenêtre sur un `exit` volontaire tout en maintenant le terminal ouvert en cas d'erreur réseau pour diagnostic.
+   * Commande `gui` unifiée combinant affichage distant matériel (`virt-viewer --wait`) et ouverture automatisée du navigateur hôte (`xdg-open`) sur le portail Web Wazuh.

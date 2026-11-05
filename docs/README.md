@@ -54,7 +54,7 @@ sudo apt update && sudo apt install -y virt-viewer x11-utils
 ### Installation
 1. Clone the repository:
    ```bash
-   git clone [https://github.com/](https://github.com/)<your-username>/cyberlab-ctl.git
+   git clone https://github.com/<your-username>/cyberlab-ctl.git
    cd cyberlab-ctl
    ```
 2. Link the executable into your path:
