@@ -1,0 +1,9 @@
+# 2. LESSONS LEARNED
+
+| Phase / Challenge | Issue Encountered | Root Cause | Solution & Best Practice |
+| :--- | :--- | :--- | :--- |
+| **Initial SSH Activation** | `Connection refused` on Kali port 22. | The `sshd` daemon is disabled by default on Kali Linux to reduce its network footprint. | Headless CLI startup via `virsh qemu-agent-command` or serial console (`systemctl enable --now ssh`). |
+| **Zsh vs. Bash Shell Profile** | Cascading error messages (`shopt: not found`, `complete: not found`) when sourcing profile files. | Kali defaults to `zsh` since 2020. A Bash prompt/profile (`PS1`) cannot be sourced directly inside a Zsh session. | Decoupled syntax: configured `PROMPT='%F{red}...%f'` in `~/.zshrc` or explicitly switched login shell via `chsh -s /bin/bash`. |
+| **Wazuh SSH Cryptography** | Silent rejection of the `id_ed25519` public key and forced fallback to password authentication. | The Wazuh Appliance enforces a strict FIPS crypto-policy disallowing `ssh-ed25519` in favor of ECDSA/RSA. | Diagnosed via `ssh -vvv`, identified server signature algorithm mismatch (`server-sig-algs`), and deployed a dedicated `id_ecdsa` key. |
+| **GUI Window Lifecycle** | Orphaned terminal windows remaining open after logout, or closing before errors could be read. | Terminal emulator behavior depends on the exit code of the child process. | Robust shell pattern: `ssh && exit || exec bash`. Isolates terminal scope without affecting global host Bash sessions. |
+| **Bash Script Architecture** | Crash `syntax error: unexpected end of file` at line 261. | Inverted order between function definitions and the `case` dispatcher, alongside an orphaned brace. | Strict script structure: Constants -> Helpers/Functions -> CLI Parser (`case "$1"`). Removed global `set -e` to prevent premature exits during conditional checks. |

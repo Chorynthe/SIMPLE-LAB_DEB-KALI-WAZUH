@@ -1,4 +1,4 @@
-# Fichiers de virtualisation (KVM/QEMU, etc.)
+# Virtualization disk images (KVM/QEMU, VirtualBox, VMware)
 *.qcow2
 *.raw
 *.img
@@ -8,16 +8,16 @@
 *.ova
 *.vmdk
 
-# Clés privées réelles et secrets
+# Private keys and secrets
 *.pem
 *.key
 id_rsa
 id_rsa.pub
 
-# Journaux système bruts locaux
+# Raw local system logs
 *.log
 
-# Caches et fichiers d'OS
+# OS caches and temporary editor files
 .DS_Store
 Thumbs.db
 *~
